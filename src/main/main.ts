@@ -14,6 +14,8 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { setupTitlebar, attachTitlebarToWindow } from "custom-electron-titlebar/main";
+import { Titlebar } from 'custom-electron-titlebar';
 
 class AppUpdater {
   constructor() {
@@ -68,11 +70,25 @@ const createWindow = async () => {
   const getAssetPath = (...paths: string[]): string => {
     return path.join(RESOURCES_PATH, ...paths);
   };
-
+  
+  const options = {
+    // title bar options
+    menuPosition: 'left'
+  };
+ 
+  setupTitlebar();
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
+    minHeight:940,
+    minWidth:560,
+    frame: false,
+    transparent: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay:{color: '#2f3241',
+    symbolColor: '#74b1be',
+    height: 40},
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -80,6 +96,8 @@ const createWindow = async () => {
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
   });
+  
+  attachTitlebarToWindow(mainWindow);
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
